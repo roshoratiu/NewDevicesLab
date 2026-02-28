@@ -165,23 +165,14 @@ These are not implemented yet, but the permission model already anticipates them
 
 ## MonsterASP deployment (ndl.runasp.net)
 
-### 1) Build publish package
-
-```bash
-chmod +x scripts/publish-monsterasp.sh
-./scripts/publish-monsterasp.sh
-```
-
-Published output is generated in `publish/monsterasp`.
-
-### 2) Upload to hosting
+### 1) Upload to hosting
 
 - Hostname: `site57027.siteasp.net`
 - Protocol: SFTP (port `22`) or FTP (port `21`)
 - Target directory: `/wwwroot`
 - Upload all files from `publish/monsterasp` into `/wwwroot`
 
-### 3) Configure production database
+### 2) Configure production database
 
 - SQL host: `db42967.databaseasp.net`
 - SQL database: `db42967`
@@ -194,13 +185,13 @@ ConnectionStrings__DefaultConnection=Server=db42967.databaseasp.net;Database=db4
 
 If environment variables are not available in the panel, set the same value in `appsettings.Production.json` on the server copy only.
 
-### 4) Verify deployment
+### 3) Verify deployment
 
 - Open `https://ndl.runasp.net/swagger`
 - Open `https://ndl.runasp.net/swagger/v1/swagger.json`
 - Test `GET /api/devices`
 
-## CI/CD (auto deploy on main)
+## CI/CD (deployment path)
 
 GitHub Actions workflow: `.github/workflows/deploy-monsterasp.yml`
 
@@ -225,4 +216,4 @@ The FTP deployment requires three repository secrets on GitHub. Follow these ste
 | `MONSTERASP_FTP_USERNAME` | `site57027` |
 | `MONSTERASP_FTP_PASSWORD` | (paste your FTP password from MonsterASP panel) |
 
-Once all three are saved, each push to `main` will automatically build, publish, and deploy to `/wwwroot` on MonsterASP.
+Once all three are saved, each push to `main` will automatically build, publish, and deploy to `/wwwroot` on MonsterASP. This pipeline is now the only supported deployment path.

@@ -24,7 +24,7 @@ public static class DependencyInjection
         var connectionString = configuredConnection;
         if (string.IsNullOrWhiteSpace(connectionString))
         {
-            connectionString = $"Server=localhost,1434;Database=NewDevicesLabDb;User Id=sa;Password={password};TrustServerCertificate=True;Encrypt=False";
+            connectionString = $"Server=127.0.0.1,1434;Database=NewDevicesLabDb;User Id=sa;Password={password};TrustServerCertificate=True;Encrypt=False";
         }
         else if (connectionString.Contains(ProductionPlaceholderPassword, StringComparison.Ordinal))
         {

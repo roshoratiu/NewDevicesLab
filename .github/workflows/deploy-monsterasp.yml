@@ -32,10 +32,15 @@ jobs:
         run: dotnet restore NewDevicesLab.sln
 
       - name: Build
-        run: dotnet build NewDevicesLab.sln --configuration Release --no-restore
+        run: dotnet build NewDevicesLab.sln --configuration Release --no-restore /p:UseAppHost=false
 
       - name: Publish frontend
-        run: dotnet publish src/frontend/NewDevicesLab.Frontend.csproj --configuration Release --output publish/monsterasp --no-build
+        run: >
+          dotnet publish src/frontend/NewDevicesLab.Frontend.csproj
+          --configuration Release
+          --output publish/monsterasp
+          --no-build
+          /p:UseAppHost=false
 
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -48,3 +53,6 @@ jobs:
           local-dir: publish/monsterasp/
           server-dir: /wwwroot/
           dangerous-clean-slate: false
+          exclude: |
+            **/*.pdb
+            **/appsettings.Development.json
