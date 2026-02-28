@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>New Devices Lab</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="page-shell">
+        <section class="auth-screen" id="authScreen">
+            <div class="auth-hero">
+                <p class="eyebrow">New Devices Lab</p>
+                <h1>Protect the lab, keep access tidy, and manage people from one calm control panel.</h1>
+                <p class="hero-copy">
+                    The first secure pass uses a local cookie session, permission-based access rules,
+                    and an administrator workspace for users, groups, and permissions.
+                </p>
+                <div class="hero-pill-row">
+                    <span class="pill">White-ish cute UI</span>
+                    <span class="pill">Permission claims</span>
+                    <span class="pill">Admin ready</span>
+                </div>
+            </div>
+
+            <div class="login-card">
+                <p class="eyebrow">Sign in</p>
+                <h2>Admin Login</h2>
+                <p class="muted">Use the seeded admin account to enter the protected admin console.</p>
+
+                <form id="loginForm">
+                    <label>
+                        Username or email
+                        <input type="text" name="identifier" autocomplete="username" placeholder="admin or admin@ru.nl" required>
+                    </label>
+                    <label>
+                        Password
+                        <input type="password" name="password" autocomplete="current-password" required>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="rememberMe">
+                        <span>Keep me signed in</span>
+                    </label>
+                    <button type="submit">Enter admin console</button>
+                    <p class="form-message" id="loginMessage"></p>
+                </form>
+
+                <div class="helper-note">
+                    Seeded account: <strong>admin</strong><br>
+                    Default password: <strong>ChangeMeNow!2026</strong>
+                </div>
+            </div>
+        </section>
+
+        <div class="admin-shell hidden" id="adminShell">
+            <aside class="sidebar">
+                <div class="brand-card">
+                    <div class="brand-badge">NDL</div>
+                    <div>
+                        <p class="eyebrow">Cute control room</p>
+                        <h2>Admin Hub</h2>
+                    </div>
+                </div>
+
+                <nav class="menu">
+                    <a class="menu-item is-active" href="#overview">Overview</a>
+                    <a class="menu-item" href="#users">Users</a>
+                    <a class="menu-item" href="#memberships">Memberships</a>
+                    <a class="menu-item" href="#groupPermissions">Group Permissions</a>
+                    <a class="menu-item" href="#permissionCatalog">Permission Catalog</a>
+                    <a class="menu-item" href="/swagger">API Docs</a>
+                </nav>
+
+                <section class="status-card">
+                    <p class="eyebrow">Signed in</p>
+                    <h3 id="currentUserName">admin</h3>
+                    <p id="currentUserMeta">Administrator</p>
+                    <button class="ghost-button" id="logoutButton" type="button">Log out</button>
+                </section>
+            </aside>
+
+            <main class="content">
+                <section class="hero-card" id="overview">
+                    <div>
+                        <p class="eyebrow">Protected administration</p>
+                        <h1>Manage users, memberships, and permission layers from one place.</h1>
+                        <p class="hero-copy">
+                            The admin interface is protected by a secure cookie session and permission claims.
+                            Users can belong to multiple groups, and groups define what users can do.
+                        </p>
+                    </div>
+                    <div class="stats-grid">
+                        <article class="stat-card">
+                            <span class="stat-label">Users</span>
+                            <strong class="stat-value" data-stat="users">0</strong>
+                        </article>
+                        <article class="stat-card">
+                            <span class="stat-label">Groups</span>
+                            <strong class="stat-value" data-stat="groups">0</strong>
+                        </article>
+                        <article class="stat-card">
+                            <span class="stat-label">Permissions</span>
+                            <strong class="stat-value" data-stat="permissions">0</strong>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="workspace-grid">
+                    <section class="panel" id="users">
+                        <div class="panel-head">
+                            <div>
+                                <p class="eyebrow">People</p>
+                                <h3>User Directory</h3>
+                            </div>
+                        </div>
+                        <div class="card-list" id="usersList">
+                            <p>Loading users...</p>
+                        </div>
+                    </section>
+
+                    <section class="panel">
+                        <div class="panel-head">
+                            <div>
+                                <p class="eyebrow">Create</p>
+                                <h3>Add User</h3>
+                            </div>
+                        </div>
+                        <form id="createUserForm">
+                            <label>
+                                Radboud Email
+                                <input type="email" name="radboudEmail" placeholder="name@ru.nl" required>
+                            </label>
+                            <label>
+                                Username
+                                <input type="text" name="username" placeholder="username" required>
+                            </label>
+                            <label>
+                                Password
+                                <input type="password" name="password" minlength="12" required>
+                            </label>
+                            <label>
+                                Student Number
+                                <input type="text" name="studentNumber" placeholder="s1234567" required>
+                            </label>
+                            <label>
+                                Enrollment Date
+                                <input type="date" name="enrollmentDate" required>
+                            </label>
+                            <fieldset>
+                                <legend>Initial groups</legend>
+                                <div class="checkbox-stack" id="createGroupOptions">Loading groups...</div>
+                            </fieldset>
+                            <button type="submit">Create user</button>
+                            <p class="form-message" id="createUserMessage"></p>
+                        </form>
+                    </section>
+                </section>
+
+                <section class="workspace-grid">
+                    <section class="panel" id="memberships">
+                        <div class="panel-head">
+                            <div>
+                                <p class="eyebrow">Memberships</p>
+                                <h3>Assign Users To Groups</h3>
+                            </div>
+                        </div>
+                        <form id="membershipForm">
+                            <label>
+                                Select user
+                                <select id="membershipUserSelect" name="userId"></select>
+                            </label>
+                            <fieldset>
+                                <legend>Groups</legend>
+                                <div class="checkbox-stack" id="membershipGroupOptions">Choose a user first.</div>
+                            </fieldset>
+                            <button type="submit">Save memberships</button>
+                            <p class="form-message" id="membershipMessage"></p>
+                        </form>
+                    </section>
+
+                    <section class="panel" id="groupPermissions">
+                        <div class="panel-head">
+                            <div>
+                                <p class="eyebrow">Permissions</p>
+                                <h3>Set Group Permissions</h3>
+                            </div>
+                        </div>
+                        <form id="groupPermissionForm">
+                            <label>
+                                Select group
+                                <select id="groupPermissionSelect" name="groupId"></select>
+                            </label>
+                            <fieldset>
+                                <legend>Allowed actions</legend>
+                                <div class="checkbox-stack permission-stack" id="permissionOptions">Choose a group first.</div>
+                            </fieldset>
+                            <button type="submit">Save permissions</button>
+                            <p class="form-message" id="groupPermissionMessage"></p>
+                        </form>
+                    </section>
+                </section>
+
+                <section class="workspace-grid lower-grid">
+                    <section class="panel">
+                        <div class="panel-head">
+                            <div>
+                                <p class="eyebrow">Groups</p>
+                                <h3>Group Summary</h3>
+                            </div>
+                        </div>
+                        <div class="card-list" id="groupsList">
+                            <p>Loading groups...</p>
+                        </div>
+                    </section>
+
+                    <section class="panel" id="permissionCatalog">
+                        <div class="panel-head">
+                            <div>
+                                <p class="eyebrow">Catalog</p>
+                                <h3>Permission Catalog</h3>
+                            </div>
+                        </div>
+                        <div class="tag-grid" id="permissionsList">
+                            <p>Loading permissions...</p>
+                        </div>
+                    </section>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="/app.js" defer></script>
+</body>
+</html>
