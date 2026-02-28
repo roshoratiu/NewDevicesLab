@@ -7,13 +7,12 @@ using NewDevicesLab.Application.Administration;
 using NewDevicesLab.Application.Devices;
 using NewDevicesLab.Application.Security;
 using NewDevicesLab.Frontend.Security;
-using NewDevicesLab.Infrastructure.Security;
 using NewDevicesLab.Persistance;
 using NewDevicesLab.Persistance.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllersWithViews();
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -91,7 +90,6 @@ using (var scope = app.Services.CreateScope())
 	await EnsureDatabaseIsReadyAsync(dbContext, passwordHasher, CancellationToken.None);
 }
 
-app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseSwagger();
 app.UseSwaggerUI(options =>
@@ -104,6 +102,9 @@ app.UseSwaggerUI(options =>
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapControllerRoute(
+	name: "default",
+	pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
 
