@@ -35,12 +35,22 @@ jobs:
         run: dotnet build NewDevicesLab.sln --configuration Release --no-restore /p:UseAppHost=false
 
       - name: Publish frontend
-        run: >
-          dotnet publish src/frontend/NewDevicesLab.Frontend.csproj
-          --configuration Release
-          --output publish/monsterasp
-          --no-build
-          /p:UseAppHost=false
+        run: |
+          rm -rf publish/monsterasp
+          dotnet publish src/frontend/NewDevicesLab.Frontend.csproj \
+            --configuration Release \
+            --output publish/monsterasp \
+            --no-restore \
+            /p:UseAppHost=false
+          rm -f publish/monsterasp/NewDevicesLab.Frontend
+
+      - name: Put site offline
+        run: |
+          printf '<html><body>Deployment in progress</body></html>' > app_offline.htm
+          curl --fail --ftp-create-dirs \
+            --user "${{ secrets.MONSTERASP_FTP_USERNAME }}:${{ secrets.MONSTERASP_FTP_PASSWORD }}" \
+            -T app_offline.htm \
+            "ftp://${{ secrets.MONSTERASP_FTP_SERVER }}/wwwroot/app_offline.htm"
 
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -56,3 +66,13 @@ jobs:
           exclude: |
             **/*.pdb
             **/appsettings.Development.json
+            **/NewDevicesLab.Frontend
+            **/app_offline.htm
+
+      - name: Bring site online
+        if: always()
+        run: |
+          curl --fail \
+            --user "${{ secrets.MONSTERASP_FTP_USERNAME }}:${{ secrets.MONSTERASP_FTP_PASSWORD }}" \
+            "ftp://${{ secrets.MONSTERASP_FTP_SERVER }}/" \
+            -Q "DELE /wwwroot/app_offline.htm" || true
