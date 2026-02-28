@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
@@ -87,8 +88,7 @@ using (var scope = app.Services.CreateScope())
 {
 	var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 	var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
-	dbContext.Database.EnsureCreated();
-	await AppDbSeeder.SeedAsync(dbContext, passwordHasher, CancellationToken.None);
+	await EnsureDatabaseIsReadyAsync(dbContext, passwordHasher, CancellationToken.None);
 }
 
 app.UseDefaultFiles();
@@ -106,3 +106,28 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static async Task EnsureDatabaseIsReadyAsync(
+	AppDbContext dbContext,
+	IPasswordHasher passwordHasher,
+	CancellationToken cancellationToken)
+{
+	const int maxAttempts = 12;
+
+	for (var attempt = 1; attempt <= maxAttempts; attempt++)
+	{
+		try
+		{
+			await dbContext.Database.EnsureCreatedAsync(cancellationToken);
+			await AppDbSeeder.SeedAsync(dbContext, passwordHasher, cancellationToken);
+			return;
+		}
+		catch (SqlException) when (attempt < maxAttempts)
+		{
+			await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+		}
+	}
+
+	await dbContext.Database.EnsureCreatedAsync(cancellationToken);
+	await AppDbSeeder.SeedAsync(dbContext, passwordHasher, cancellationToken);
+}

@@ -6,6 +6,12 @@ on:
       - main
   workflow_dispatch:
 
+# IMPORTANT: Before first run, set GitHub Secrets in your repository:
+# Settings > Secrets and variables > Actions > New Repository Secret
+#   MONSTERASP_FTP_SERVER = site57027.siteasp.net
+#   MONSTERASP_FTP_USERNAME = site57027
+#   MONSTERASP_FTP_PASSWORD = your_monsterasp_ftp_password
+
 permissions:
   contents: read
 

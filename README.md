@@ -16,12 +16,13 @@ Layered .NET 8 solution for the course project.
 1. Ensure your `.env` exists (it is created from `.env.example`):
    - `MSSQL_SA_PASSWORD=Your_strong_password_123!`
 2. Start SQL Server:
-   - `docker compose up -d`
+   - `docker compose up -d --wait`
 3. SQL Server is exposed on `localhost,1434` (host port), container internal port is `1433`.
 
 ## Run the API
 
 ```bash
+docker compose up -d --wait
 dotnet run --project src/frontend/NewDevicesLab.Frontend.csproj
 ```
 
@@ -29,6 +30,7 @@ dotnet run --project src/frontend/NewDevicesLab.Frontend.csproj
 
 - The current secure pass uses local username/email + password login with a server-side cookie session.
 - Admin APIs and the devices API now require authenticated access plus permission claims.
+- The app now retries database startup for about 60 seconds so first-run SQL warm-up does not immediately crash the web host.
 - The seeded bootstrap administrator is:
   - Username: `admin`
   - Email: `admin@ru.nl`
@@ -207,10 +209,20 @@ Trigger:
 - Push to `main`
 - Manual run via `workflow_dispatch`
 
-Required GitHub repository secrets:
+### Setup GitHub Secrets (one-time, required)
 
-- `MONSTERASP_FTP_SERVER` = `site57027.siteasp.net`
-- `MONSTERASP_FTP_USERNAME` = `site57027`
-- `MONSTERASP_FTP_PASSWORD` = your MonsterASP FTP password
+The FTP deployment requires three repository secrets on GitHub. Follow these steps:
 
-After secrets are set, each push to `main` builds, publishes, and uploads to `/wwwroot` automatically.
+1. Go to your GitHub repository
+2. Click **Settings** (top menu)
+3. Click **Secrets and variables** > **Actions** (left sidebar)
+4. Click **New repository secret** (green button)
+5. Create each secret:
+
+| Name | Value |
+|------|-------|
+| `MONSTERASP_FTP_SERVER` | `site57027.siteasp.net` |
+| `MONSTERASP_FTP_USERNAME` | `site57027` |
+| `MONSTERASP_FTP_PASSWORD` | (paste your FTP password from MonsterASP panel) |
+
+Once all three are saved, each push to `main` will automatically build, publish, and deploy to `/wwwroot` on MonsterASP.
