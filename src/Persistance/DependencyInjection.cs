@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NewDevicesLab.Application.Administration;
 using NewDevicesLab.Application.Devices;
+using NewDevicesLab.Application.Projects;
 using NewDevicesLab.Application.Security;
 using NewDevicesLab.Persistance.Data;
 using NewDevicesLab.Persistance.Repositories;
@@ -24,7 +25,7 @@ public static class DependencyInjection
         var connectionString = configuredConnection;
         if (string.IsNullOrWhiteSpace(connectionString))
         {
-            connectionString = $"Server=localhost,1434;Database=NewDevicesLabDb;User Id=sa;Password={password};TrustServerCertificate=True;Encrypt=False";
+            connectionString = $"Server=127.0.0.1,1434;Database=NewDevicesLabDb;User Id=sa;Password={password};TrustServerCertificate=True;Encrypt=False";
         }
         else if (connectionString.Contains(ProductionPlaceholderPassword, StringComparison.Ordinal))
         {
@@ -42,6 +43,7 @@ public static class DependencyInjection
         services.AddScoped<IDeviceRepository, DeviceRepository>();
         services.AddScoped<IAdministrationRepository, AdministrationRepository>();
         services.AddScoped<IIdentityRepository, IdentityRepository>();
+        services.AddScoped<IProjectRepository, ProjectRepository>();
         return services;
     }
 }

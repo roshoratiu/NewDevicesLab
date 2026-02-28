@@ -16,32 +16,16 @@ public class AuthController(IIdentityService identityService) : ControllerBase
     [Authorize]
     [ProducesResponseType(typeof(AuthenticatedUserDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public ActionResult<AuthenticatedUserDto> Me()
+    public async Task<ActionResult<AuthenticatedUserDto>> Me(CancellationToken cancellationToken)
     {
-        var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdValue, out var userId))
+        var userId = GetCurrentUserId();
+        if (userId is null)
         {
             return Unauthorized();
         }
 
-        var permissions = User.FindAll(PermissionAuthorizationHandler.PermissionClaimType)
-            .Select(item => item.Value)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(item => item)
-            .ToList();
-
-        var groups = User.FindAll(PermissionAuthorizationHandler.GroupClaimType)
-            .Select(item => item.Value)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(item => item)
-            .ToList();
-
-        return Ok(new AuthenticatedUserDto(
-            userId,
-            User.FindFirstValue(ClaimTypes.Email) ?? string.Empty,
-            User.Identity?.Name ?? string.Empty,
-            groups,
-            permissions));
+        var user = await identityService.GetAuthenticatedUserAsync(userId.Value, cancellationToken);
+        return user is null ? Unauthorized() : Ok(user);
     }
 
     [HttpPost("login")]
@@ -62,22 +46,9 @@ public class AuthController(IIdentityService identityService) : ControllerBase
             return Unauthorized("Invalid username/email or password.");
         }
 
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Name, user.Username),
-            new(ClaimTypes.Email, user.RadboudEmail)
-        };
-
-        claims.AddRange(user.Groups.Select(group => new Claim(PermissionAuthorizationHandler.GroupClaimType, group)));
-        claims.AddRange(user.Permissions.Select(permission => new Claim(PermissionAuthorizationHandler.PermissionClaimType, permission)));
-
-        var principal = new ClaimsPrincipal(
-            new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
-
         await HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
-            principal,
+            BuildPrincipal(user),
             new AuthenticationProperties
             {
                 IsPersistent = request.RememberMe,
@@ -88,6 +59,85 @@ public class AuthController(IIdentityService identityService) : ControllerBase
         return Ok(user);
     }
 
+    [HttpPut("profile")]
+    [Authorize]
+    [ProducesResponseType(typeof(AuthenticatedUserDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<AuthenticatedUserDto>> UpdateProfile(
+        [FromBody] UpdateProfileRequest request,
+        CancellationToken cancellationToken)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            var updatedUser = await identityService.UpdateProfileAsync(
+                userId.Value,
+                request.Username,
+                cancellationToken);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                BuildPrincipal(updatedUser),
+                new AuthenticationProperties
+                {
+                    IsPersistent = User.Identity?.IsAuthenticated == true,
+                    AllowRefresh = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
+                });
+
+            return Ok(updatedUser);
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+    }
+
+    [HttpPost("change-password")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ChangePassword(
+        [FromBody] ChangePasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            await identityService.ChangePasswordAsync(
+                userId.Value,
+                request.CurrentPassword,
+                request.NewPassword,
+                cancellationToken);
+
+            return NoContent();
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+    }
+
     [HttpPost("logout")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -96,6 +146,32 @@ public class AuthController(IIdentityService identityService) : ControllerBase
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return NoContent();
     }
+
+    private Guid? GetCurrentUserId()
+    {
+        var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return Guid.TryParse(userIdValue, out var userId) ? userId : null;
+    }
+
+    private static ClaimsPrincipal BuildPrincipal(AuthenticatedUserDto user)
+    {
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Name, user.Username),
+            new(ClaimTypes.Email, user.RadboudEmail)
+        };
+
+        claims.AddRange(user.Groups.Select(group => new Claim(PermissionAuthorizationHandler.GroupClaimType, group)));
+        claims.AddRange(user.Permissions.Select(permission => new Claim(PermissionAuthorizationHandler.PermissionClaimType, permission)));
+
+        return new ClaimsPrincipal(
+            new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
+    }
 }
 
 public sealed record LoginRequest(string Identifier, string Password, bool RememberMe);
+
+public sealed record UpdateProfileRequest(string Username);
+
+public sealed record ChangePasswordRequest(string CurrentPassword, string NewPassword);

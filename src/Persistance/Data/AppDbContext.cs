@@ -17,6 +17,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     public DbSet<GroupPermission> GroupPermissions => Set<GroupPermission>();
 
+    public DbSet<Project> Projects => Set<Project>();
+
+    public DbSet<ProjectMember> ProjectMembers => Set<ProjectMember>();
+
+    public DbSet<OrderSheet> OrderSheets => Set<OrderSheet>();
+
+    public DbSet<OrderSheetItem> OrderSheetItems => Set<OrderSheetItem>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Device>(entity =>
@@ -118,6 +126,87 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.HasOne(item => item.Permission)
                 .WithMany(item => item.GroupPermissions)
                 .HasForeignKey(item => item.PermissionId);
+        });
+
+        modelBuilder.Entity<Project>(entity =>
+        {
+            entity.HasKey(item => item.Id);
+            entity.Property(item => item.Name)
+                .HasMaxLength(160)
+                .IsRequired();
+            entity.Property(item => item.Idea)
+                .HasMaxLength(240)
+                .IsRequired();
+            entity.Property(item => item.Description)
+                .HasMaxLength(2000)
+                .IsRequired();
+            entity.Property(item => item.Status)
+                .HasMaxLength(60)
+                .IsRequired();
+            entity.Property(item => item.CreatedAtUtc)
+                .IsRequired();
+            entity.HasOne(item => item.CreatedByUser)
+                .WithMany(item => item.CreatedProjects)
+                .HasForeignKey(item => item.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<ProjectMember>(entity =>
+        {
+            entity.HasKey(item => item.Id);
+            entity.HasIndex(item => new { item.ProjectId, item.UserId })
+                .IsUnique();
+            entity.Property(item => item.IsOwner)
+                .IsRequired();
+            entity.Property(item => item.AddedAtUtc)
+                .IsRequired();
+            entity.HasOne(item => item.Project)
+                .WithMany(item => item.Members)
+                .HasForeignKey(item => item.ProjectId);
+            entity.HasOne(item => item.User)
+                .WithMany(item => item.ProjectMemberships)
+                .HasForeignKey(item => item.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<OrderSheet>(entity =>
+        {
+            entity.HasKey(item => item.Id);
+            entity.Property(item => item.Status)
+                .HasMaxLength(60)
+                .IsRequired();
+            entity.Property(item => item.CreatedAtUtc)
+                .IsRequired();
+            entity.HasOne(item => item.Project)
+                .WithMany(item => item.OrderSheets)
+                .HasForeignKey(item => item.ProjectId);
+            entity.HasOne(item => item.CreatedByUser)
+                .WithMany(item => item.CreatedOrderSheets)
+                .HasForeignKey(item => item.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<OrderSheetItem>(entity =>
+        {
+            entity.HasKey(item => item.Id);
+            entity.Property(item => item.SiteName)
+                .HasMaxLength(200)
+                .IsRequired();
+            entity.Property(item => item.ComponentName)
+                .HasMaxLength(200)
+                .IsRequired();
+            entity.Property(item => item.Brand)
+                .HasMaxLength(120)
+                .IsRequired();
+            entity.Property(item => item.Link)
+                .HasMaxLength(1000)
+                .IsRequired();
+            entity.Property(item => item.PriceEuro)
+                .HasColumnType("decimal(10,2)")
+                .IsRequired();
+            entity.HasOne(item => item.OrderSheet)
+                .WithMany(item => item.Items)
+                .HasForeignKey(item => item.OrderSheetId);
         });
     }
 }

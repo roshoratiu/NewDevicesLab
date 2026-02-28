@@ -4,115 +4,248 @@
 
 <div class="page-shell">
     <section class="login-layout" id="loginView">
-        <section class="login-brand">
-            <div class="brand-mark">NDL</div>
-            <h1>New Devices Lab</h1>
-            <p class="brand-copy">Manage people, projects, and ordering from one place.</p>
-        </section>
+        <div class="login-stack">
+            <p class="login-year">2026 New Devices Lab</p>
 
-        <section class="login-panel">
-            <div class="panel-head">
-                <p class="eyebrow">Sign in</p>
-                <h2>Welcome back</h2>
-            </div>
+            <section class="login-panel">
+                <div class="panel-head">
+                    <p class="kicker">Sign in</p>
+                    <h2>Welcome back</h2>
+                    <p class="muted">Use your username or your Radboud email.</p>
+                </div>
 
-            <form id="loginForm">
-                <label>
-                    Username or email
-                    <input type="text" name="identifier" autocomplete="username" required />
-                </label>
-                <label>
-                    Password
-                    <input type="password" name="password" autocomplete="current-password" required />
-                </label>
-                <label class="checkbox-inline">
-                    <input type="checkbox" name="rememberMe" />
-                    <span>Keep me signed in</span>
-                </label>
-                <button type="submit">Login</button>
-                <p class="form-message" id="loginMessage"></p>
-            </form>
-        </section>
+                <form id="loginForm" class="form-stack">
+                    <label>
+                        Username or email
+                        <input type="text" name="identifier" autocomplete="username" required />
+                    </label>
+                    <label>
+                        Password
+                        <input type="password" name="password" autocomplete="current-password" required />
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="rememberMe" />
+                        <span>Keep me signed in</span>
+                    </label>
+                    <button type="submit" class="primary-button">Login</button>
+                    <p class="form-message" id="loginMessage"></p>
+                </form>
+            </section>
+
+            <section class="login-brand">
+                <h1>New Devices Lab Portal</h1>
+            </section>
+        </div>
     </section>
 
-    <div class="app-shell hidden" id="appView">
+    <div class="workspace-shell hidden" id="appView">
         <aside class="sidebar">
             <div class="sidebar-brand">
-                <div class="brand-mark small">NDL</div>
+                <div class="brand-badge brand-badge-small">NDL</div>
                 <div>
-                    <p class="eyebrow">Workspace</p>
+                    <p class="kicker">Workspace</p>
                     <h2>New Devices Lab</h2>
                 </div>
             </div>
 
-            <nav class="sidebar-nav" id="sidebarNav">
-                <a class="nav-link is-active" href="#homeSection">Home</a>
-                <a class="nav-link hidden" id="adminNavLink" href="#adminSection">Admin</a>
-                <a class="nav-link" href="/swagger">API</a>
+            <nav class="sidebar-nav">
+                <button type="button" class="nav-link is-active" data-section-target="projectsSection">Projects</button>
+                <button type="button" class="nav-link" data-section-target="accessSection">My Access</button>
             </nav>
 
-            <div class="sidebar-user">
-                <p class="eyebrow">Signed in</p>
-                <h3 id="currentUserName">User</h3>
-                <p class="muted" id="currentUserMeta"></p>
-                <button class="secondary-button" id="logoutButton" type="button">Logout</button>
+            <div class="sidebar-account">
+                <button type="button" class="account-trigger" id="accountMenuButton">
+                    <span class="account-avatar" id="accountInitials">U</span>
+                    <span class="account-copy">
+                        <strong id="currentUserName">User</strong>
+                        <span id="currentUserMeta">Account</span>
+                    </span>
+                </button>
+
+                <div class="account-menu hidden" id="accountMenuPanel">
+                    <button type="button" class="menu-link" id="profileMenuButton">My profile</button>
+                    <button type="button" class="menu-link hidden" id="accountAdminButton">Admin</button>
+                    <button type="button" class="menu-link danger" id="logoutButton">Logout</button>
+                </div>
             </div>
         </aside>
 
-        <main class="content">
-            <section class="hero-card" id="homeSection">
+        <main class="workspace-main">
+            <section class="topbar">
                 <div>
-                    <p class="eyebrow">Home</p>
-                    <h1 id="homeTitle">Welcome</h1>
-                    <p class="hero-copy" id="homeCopy"></p>
+                    <h1 class="page-title" id="homeTitle">Projects</h1>
+                    <p class="muted" id="homeCopy">Your workspace, project overview, and access details.</p>
                 </div>
-                <div class="summary-grid">
-                    <article class="summary-card">
-                        <span class="summary-label">Groups</span>
-                        <strong class="summary-value" id="groupCount">0</strong>
-                    </article>
-                    <article class="summary-card">
-                        <span class="summary-label">Permissions</span>
-                        <strong class="summary-value" id="permissionCount">0</strong>
-                    </article>
+                <div class="topbar-actions">
+                    <label class="search-shell">
+                        <span>Search</span>
+                        <input type="search" placeholder="Search projects..." />
+                    </label>
+                    <button type="button" class="primary-button" id="openProjectModalButton">Create New Project</button>
                 </div>
             </section>
 
-            <section class="user-section" id="userInfoSection">
+            <section class="hero-strip">
+                <article class="hero-card">
+                    <span class="metric-label">Groups</span>
+                    <strong class="metric-value" id="groupCount">0</strong>
+                </article>
+                <article class="hero-card">
+                    <span class="metric-label">Permissions</span>
+                    <strong class="metric-value" id="permissionCount">0</strong>
+                </article>
+                <article class="hero-card hidden" id="adminHeroCard">
+                    <span class="metric-label">Admin Access</span>
+                    <strong class="metric-value">Enabled</strong>
+                </article>
+            </section>
+
+            <section class="projects-section" id="projectsSection">
                 <div class="section-head">
-                    <p class="eyebrow">Account</p>
-                    <h3>Your access</h3>
+                    <div>
+                        <p class="kicker">Projects</p>
+                        <h3>Your workspace</h3>
+                    </div>
+                    <span class="muted" id="projectAccessHint">Your project access is based on your permissions and memberships.</span>
                 </div>
-                <div class="account-grid">
+
+                <div class="project-board">
                     <section class="card">
-                        <h4>Groups</h4>
+                        <div class="section-head compact">
+                            <div>
+                                <p class="kicker">Project list</p>
+                                <h4>Visible projects</h4>
+                            </div>
+                        </div>
+                        <div class="stack-list" id="projectsList">
+                            <p class="muted">Loading projects...</p>
+                        </div>
+                    </section>
+
+                    <section class="card card-tall">
+                        <div class="section-head compact">
+                            <div>
+                                <p class="kicker">Project details</p>
+                                <h4 id="selectedProjectName">Select a project</h4>
+                            </div>
+                            <span class="status-pill" id="selectedProjectStatus">Idle</span>
+                        </div>
+
+                        <div class="detail-stack">
+                            <p class="muted" id="selectedProjectIdea">Pick a project to view the team, idea, and orders.</p>
+                            <p class="detail-copy" id="selectedProjectDescription"></p>
+                            <p class="muted" id="selectedProjectMeta"></p>
+
+                            <section class="detail-block">
+                                <h4>Members</h4>
+                                <div class="chip-list" id="selectedProjectMembers"></div>
+                            </section>
+
+                            <section class="detail-block hidden" id="statusEditorSection">
+                                <h4>Project status</h4>
+                                <div class="inline-composer">
+                                    <select id="projectStatusSelect">
+                                        <option>Draft</option>
+                                        <option>Active</option>
+                                        <option>Review</option>
+                                        <option>Completed</option>
+                                        <option>Paused</option>
+                                    </select>
+                                    <button type="button" class="secondary-button" id="saveProjectStatusButton">Save status</button>
+                                </div>
+                                <p class="form-message" id="projectStatusMessage"></p>
+                            </section>
+
+                            <section class="detail-block">
+                                <div class="section-head compact">
+                                    <div>
+                                        <h4>Order sheets</h4>
+                                    </div>
+                                </div>
+                                <div class="stack-list" id="selectedProjectOrderSheets">
+                                    <p class="muted">No project selected yet.</p>
+                                </div>
+                            </section>
+
+                            <section class="detail-block hidden" id="orderSheetSection">
+                                <div class="section-head compact">
+                                    <div>
+                                        <h4>Create order sheet</h4>
+                                    </div>
+                                </div>
+                                <form id="orderSheetForm" class="form-stack">
+                                    <div class="order-items-stack" id="orderSheetItems">
+                                        <div class="order-item-grid">
+                                            <input type="text" name="siteName" placeholder="Site name" required />
+                                            <input type="text" name="componentName" placeholder="Component name" required />
+                                            <input type="text" name="brand" placeholder="Brand" required />
+                                            <input type="url" name="link" placeholder="Link" required />
+                                            <input type="number" name="priceEuro" min="0.01" step="0.01" placeholder="Price in euro" required />
+                                        </div>
+                                    </div>
+                                    <div class="inline-composer">
+                                        <button type="button" class="secondary-button" id="addOrderItemButton">Add another item</button>
+                                        <label class="checkbox-inline compact-checkbox">
+                                            <input type="checkbox" name="submitNow" />
+                                            <span>Submit now</span>
+                                        </label>
+                                    </div>
+                                    <button type="submit" class="primary-button">Save order sheet</button>
+                                    <p class="form-message" id="orderSheetMessage"></p>
+                                </form>
+                            </section>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="project-grid" id="accessSection">
+                    <article class="project-card">
+                        <div class="project-card-head">
+                            <span class="status-pill">Access</span>
+                        </div>
+                        <h4>Your groups</h4>
                         <div class="chip-list" id="userGroups"></div>
-                    </section>
-                    <section class="card">
-                        <h4>Permissions</h4>
+                    </article>
+
+                    <article class="project-card">
+                        <div class="project-card-head">
+                            <span class="status-pill">Permissions</span>
+                        </div>
+                        <h4>Your permissions</h4>
                         <div class="chip-list" id="userPermissions"></div>
-                    </section>
+                    </article>
+
+                    <article class="project-card project-card-featured">
+                        <div class="project-card-head">
+                            <span class="status-pill status-live">Create</span>
+                        </div>
+                        <h4>Start a new project</h4>
+                        <p>Create a project, invite other students by email, and keep the idea and description organized in one place.</p>
+                        <button type="button" class="secondary-button" id="openProjectModalButtonAlt">Open project form</button>
+                    </article>
                 </div>
             </section>
 
             <section class="admin-section hidden" id="adminSection">
                 <div class="section-head">
-                    <p class="eyebrow">Administration</p>
-                    <h3>Manage access</h3>
+                    <div>
+                        <p class="kicker">Administration</p>
+                        <h3>Manage people, groups, and permissions</h3>
+                    </div>
                 </div>
 
                 <div class="stats-row">
                     <article class="stat-card">
-                        <span class="summary-label">Users</span>
-                        <strong class="summary-value" data-stat="users">0</strong>
+                        <span class="metric-label">Users</span>
+                        <strong class="metric-value" id="usersStat">0</strong>
                     </article>
                     <article class="stat-card">
-                        <span class="summary-label">Groups</span>
-                        <strong class="summary-value" data-stat="groups">0</strong>
+                        <span class="metric-label">Groups</span>
+                        <strong class="metric-value" id="groupsStat">0</strong>
                     </article>
                     <article class="stat-card">
-                        <span class="summary-label">Permissions</span>
-                        <strong class="summary-value" data-stat="permissions">0</strong>
+                        <span class="metric-label">Permissions</span>
+                        <strong class="metric-value" id="permissionsStat">0</strong>
                     </article>
                 </div>
 
@@ -120,7 +253,7 @@
                     <section class="card card-tall">
                         <div class="section-head compact">
                             <div>
-                                <p class="eyebrow">Users</p>
+                                <p class="kicker">Users</p>
                                 <h4>User list</h4>
                             </div>
                         </div>
@@ -132,11 +265,11 @@
                     <section class="card">
                         <div class="section-head compact">
                             <div>
-                                <p class="eyebrow">Create</p>
+                                <p class="kicker">Create</p>
                                 <h4>Add user</h4>
                             </div>
                         </div>
-                        <form id="createUserForm">
+                        <form id="createUserForm" class="form-stack">
                             <label>
                                 Radboud Email
                                 <input type="email" name="radboudEmail" required />
@@ -161,7 +294,7 @@
                                 <legend>Groups</legend>
                                 <div class="checkbox-list" id="createGroupOptions"></div>
                             </fieldset>
-                            <button type="submit">Create user</button>
+                            <button type="submit" class="primary-button">Create user</button>
                             <p class="form-message" id="createUserMessage"></p>
                         </form>
                     </section>
@@ -171,11 +304,11 @@
                     <section class="card">
                         <div class="section-head compact">
                             <div>
-                                <p class="eyebrow">Memberships</p>
+                                <p class="kicker">Memberships</p>
                                 <h4>Assign groups</h4>
                             </div>
                         </div>
-                        <form id="membershipForm">
+                        <form id="membershipForm" class="form-stack">
                             <label>
                                 User
                                 <select id="membershipUserSelect" name="userId"></select>
@@ -184,7 +317,7 @@
                                 <legend>Groups</legend>
                                 <div class="checkbox-list" id="membershipGroupOptions"></div>
                             </fieldset>
-                            <button type="submit">Save memberships</button>
+                            <button type="submit" class="primary-button">Save memberships</button>
                             <p class="form-message" id="membershipMessage"></p>
                         </form>
                     </section>
@@ -192,11 +325,11 @@
                     <section class="card">
                         <div class="section-head compact">
                             <div>
-                                <p class="eyebrow">Permissions</p>
+                                <p class="kicker">Permissions</p>
                                 <h4>Group permissions</h4>
                             </div>
                         </div>
-                        <form id="groupPermissionForm">
+                        <form id="groupPermissionForm" class="form-stack">
                             <label>
                                 Group
                                 <select id="groupPermissionSelect" name="groupId"></select>
@@ -205,7 +338,7 @@
                                 <legend>Permissions</legend>
                                 <div class="checkbox-list long-list" id="permissionOptions"></div>
                             </fieldset>
-                            <button type="submit">Save permissions</button>
+                            <button type="submit" class="primary-button">Save permissions</button>
                             <p class="form-message" id="groupPermissionMessage"></p>
                         </form>
                     </section>
@@ -215,7 +348,7 @@
                     <section class="card">
                         <div class="section-head compact">
                             <div>
-                                <p class="eyebrow">Groups</p>
+                                <p class="kicker">Groups</p>
                                 <h4>Overview</h4>
                             </div>
                         </div>
@@ -227,7 +360,7 @@
                     <section class="card">
                         <div class="section-head compact">
                             <div>
-                                <p class="eyebrow">Permissions</p>
+                                <p class="kicker">Permissions</p>
                                 <h4>Catalog</h4>
                             </div>
                         </div>
@@ -239,4 +372,87 @@
             </section>
         </main>
     </div>
+
+    <div class="overlay hidden" id="overlay"></div>
+
+    <section class="side-panel hidden" id="profilePanel">
+        <div class="section-head">
+            <div>
+                <p class="kicker">My profile</p>
+                <h3>Account settings</h3>
+            </div>
+            <button type="button" class="icon-button" id="closeProfileButton" aria-label="Close profile panel">×</button>
+        </div>
+
+        <form id="profileForm" class="form-stack">
+            <label>
+                Radboud Email
+                <input type="email" id="profileEmail" disabled />
+            </label>
+            <label>
+                Username
+                <input type="text" name="username" id="profileUsername" required />
+            </label>
+            <button type="submit" class="primary-button">Save profile</button>
+            <p class="form-message" id="profileMessage"></p>
+        </form>
+
+        <div class="divider"></div>
+
+        <form id="passwordForm" class="form-stack">
+            <div class="section-head compact">
+                <div>
+                    <p class="kicker">Security</p>
+                    <h4>Change password</h4>
+                </div>
+            </div>
+            <label>
+                Current password
+                <input type="password" name="currentPassword" autocomplete="current-password" required />
+            </label>
+            <label>
+                New password
+                <input type="password" name="newPassword" autocomplete="new-password" minlength="12" required />
+            </label>
+            <button type="submit" class="primary-button">Update password</button>
+            <p class="form-message" id="passwordMessage"></p>
+        </form>
+    </section>
+
+    <section class="modal-shell hidden" id="projectModal">
+        <div class="modal-card">
+            <div class="section-head">
+                <div>
+                    <p class="kicker">Projects</p>
+                    <h3>Create New Project</h3>
+                    <p class="muted">The backend is next. This screen now matches the product direction.</p>
+                </div>
+                <button type="button" class="icon-button" id="closeProjectModalButton" aria-label="Close project form">×</button>
+            </div>
+
+            <form id="projectPreviewForm" class="form-stack">
+                <label>
+                    Project Name
+                    <input type="text" name="name" placeholder="e.g. Prototype-X Sensor Node" />
+                </label>
+                <label>
+                    Project Idea
+                    <input type="text" name="idea" placeholder="Short one-line idea" />
+                </label>
+                <label>
+                    Description
+                    <textarea rows="4" name="description" placeholder="Briefly describe the idea, objective, and lab setup."></textarea>
+                </label>
+                <label>
+                    Invite team by email
+                    <input type="text" name="memberEmails" placeholder="student1@ru.nl, student2@ru.nl" />
+                </label>
+                <div class="modal-actions">
+                    <button type="button" class="secondary-button" id="cancelProjectModalButton">Cancel</button>
+                    <button type="submit" class="primary-button">Initialize Project</button>
+                </div>
+                <p class="form-message" id="projectMessage"></p>
+            </form>
+        </div>
+    </section>
 </div>

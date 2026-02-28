@@ -19,4 +19,10 @@ public class AppUser
     public DateTime CreatedAtUtc { get; set; }
 
     public ICollection<UserGroup> UserGroups { get; set; } = new List<UserGroup>();
+
+    public ICollection<Project> CreatedProjects { get; set; } = new List<Project>();
+
+    public ICollection<ProjectMember> ProjectMemberships { get; set; } = new List<ProjectMember>();
+
+    public ICollection<OrderSheet> CreatedOrderSheets { get; set; } = new List<OrderSheet>();
 }
