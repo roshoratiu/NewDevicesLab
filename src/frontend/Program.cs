@@ -146,7 +146,7 @@ static async Task EnsureDatabaseIsReadyAsync(
 
 static async Task EnsureDatabaseSchemaAsync(AppDbContext dbContext, CancellationToken cancellationToken)
 {
-    var migrations = await dbContext.Database.GetMigrationsAsync(cancellationToken);
+    var migrations = dbContext.Database.GetMigrations();
 
     if (migrations.Any())
     {
